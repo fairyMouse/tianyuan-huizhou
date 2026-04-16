@@ -20,7 +20,9 @@ export default defineConfig(async (merge) => {
     outputRoot: "dist",
     plugins: [],
     defineConstants: {
-      TARO_APP_API_BASE: JSON.stringify(process.env.TARO_APP_API_BASE || "https://public.feihan.cc")
+      TARO_APP_API_BASE: JSON.stringify(
+        process.env.TARO_APP_API_BASE || "https://api.feihan.cc"
+      )
     },
     copy: {
       patterns: [],

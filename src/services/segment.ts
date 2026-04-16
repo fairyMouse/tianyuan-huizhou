@@ -26,17 +26,13 @@ function asResult(data: unknown): SegmentResultOk | SegmentFail | null {
   return null
 }
 
-function isRetryableSegmentFailure(
-  result: SegmentResultOk | SegmentFail,
-  statusCode: number,
-  errMsg: string
-): boolean {
+/**
+ * wx.request max timeout is 60s; do not retry after client timeout — that only burns another 60s.
+ * Retry only when the server returned a gateway error (quick response body).
+ */
+function isRetryableSegmentFailure(result: SegmentResultOk | SegmentFail, statusCode: number): boolean {
   if (result.ok) return false
-  const msg = `${errMsg} ${result.message}`.toLowerCase()
-  if (statusCode === 504 || statusCode === 503 || statusCode === 502) return true
-  if (msg.includes("timeout") || msg.includes("timed out")) return true
-  if (msg.includes("request:fail") || msg.includes("fail connect")) return true
-  return false
+  return statusCode === 504 || statusCode === 503 || statusCode === 502
 }
 
 async function postSegmentOnce(
@@ -77,20 +73,34 @@ async function postSegmentOnce(
   }
 }
 
+async function compressForSegment(localPath: string): Promise<string> {
+  try {
+    const { tempFilePath } = await Taro.compressImage({
+      src: localPath,
+      quality: 82,
+      compressedWidth: 1600
+    })
+    return tempFilePath || localPath
+  } catch {
+    return localPath
+  }
+}
+
 export async function segmentImage(localFilePath: string): Promise<SegmentResultOk | SegmentFail> {
+  const path = await compressForSegment(localFilePath)
   const fs = Taro.getFileSystemManager()
   const base64 = await new Promise<string>((resolve, reject) => {
     fs.readFile({
-      filePath: localFilePath,
+      filePath: path,
       encoding: "base64",
       success: (res) => resolve(res.data as string),
       fail: reject
     })
   })
 
-  let { result, statusCode, errMsg } = await postSegmentOnce(base64)
-  if (isRetryableSegmentFailure(result, statusCode, errMsg)) {
-    ;({ result, statusCode, errMsg } = await postSegmentOnce(base64))
+  let { result, statusCode } = await postSegmentOnce(base64)
+  if (isRetryableSegmentFailure(result, statusCode)) {
+    ;({ result, statusCode } = await postSegmentOnce(base64))
   }
   return result
 }
