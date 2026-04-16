@@ -16,7 +16,7 @@ const PROGRESS_LINES = [
 ]
 
 export default function GeneratingPage() {
-  const { status, resultPath, error, compose } = useImageComposer()
+  const { status, resultPath, error, errorReason, compose } = useImageComposer()
   const setResultPath = useGenerationStore((s) => s.setResultPath)
   const [lineIndex, setLineIndex] = useState(0)
 
@@ -57,6 +57,11 @@ export default function GeneratingPage() {
         <Text className="text-center font-sans text-body text-ink-light">
           {error || "生成遇到问题，请稍后再试"}
         </Text>
+        {errorReason ? (
+          <Text className="mt-4 w-full break-words text-center font-sans text-caption text-ink-mute">
+            失败原因：{errorReason}
+          </Text>
+        ) : null}
         <View className="mt-10 w-full">
           <HuiButton type="primary" onClick={retry}>
             返回重试

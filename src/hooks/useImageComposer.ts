@@ -10,10 +10,12 @@ export function useImageComposer() {
   const [status, setStatus] = useState<Status>("idle")
   const [resultPath, setResultPath] = useState("")
   const [error, setError] = useState("")
+  const [errorReason, setErrorReason] = useState("")
 
   async function compose(userImagePath: string, categoryId: CategoryId) {
     setStatus("composing")
     setError("")
+    setErrorReason("")
     try {
       const template = pickTemplate(categoryId)
       const category = CATEGORIES.find((item) => item.id === categoryId)
@@ -36,6 +38,8 @@ export function useImageComposer() {
           ? "图片处理失败，请重试或更换图片"
           : "合成失败，请重试"
       setError(message)
+      // Keep a small, user-visible reason for debugging.
+      setErrorReason(rawMessage ? rawMessage.slice(0, 120) : "")
       setStatus("error")
     }
   }
@@ -44,7 +48,8 @@ export function useImageComposer() {
     setStatus("idle")
     setResultPath("")
     setError("")
+    setErrorReason("")
   }
 
-  return { status, resultPath, error, compose, reset }
+  return { status, resultPath, error, errorReason, compose, reset }
 }
