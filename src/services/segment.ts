@@ -35,6 +35,22 @@ function isRetryableSegmentFailure(result: SegmentResultOk | SegmentFail, status
   return statusCode === 504 || statusCode === 503 || statusCode === 502
 }
 
+async function fileSizeBytes(filePath: string): Promise<number | null> {
+  try {
+    const r = await Taro.getFileInfo({ filePath })
+    if (r && typeof r === "object" && "size" in r && typeof (r as { size: unknown }).size === "number") {
+      return (r as { size: number }).size
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+function logSegmentClient(payload: Record<string, unknown>) {
+  console.log("[segmentClient]", payload)
+}
+
 async function postSegmentOnce(
   base64: string
 ): Promise<{ result: SegmentResultOk | SegmentFail; statusCode: number; errMsg: string }> {
@@ -80,14 +96,55 @@ async function compressForSegment(localPath: string): Promise<string> {
       quality: 82,
       compressedWidth: 1600
     })
-    return tempFilePath || localPath
-  } catch {
+    const out = tempFilePath || localPath
+    logSegmentClient({
+      step: "compressImage",
+      ok: true,
+      samePath: out === localPath,
+      outPathTail: out.length > 48 ? `…${out.slice(-44)}` : out
+    })
+    return out
+  } catch (err: unknown) {
+    logSegmentClient({
+      step: "compressImage",
+      ok: false,
+      err: err instanceof Error ? err.message : String(err)
+    })
     return localPath
   }
 }
 
 export async function segmentImage(localFilePath: string): Promise<SegmentResultOk | SegmentFail> {
+  const apiBase = API_BASE
+  const bytesIn = await fileSizeBytes(localFilePath)
+  let imgW: number | undefined
+  let imgH: number | undefined
+  try {
+    const img = await Taro.getImageInfo({ src: localFilePath })
+    imgW = img.width
+    imgH = img.height
+  } catch {
+    /* ignore */
+  }
+  logSegmentClient({
+    step: "start",
+    apiBase,
+    bytesIn,
+    width: imgW,
+    height: imgH,
+    pathTail: localFilePath.length > 48 ? `…${localFilePath.slice(-44)}` : localFilePath
+  })
+
   const path = await compressForSegment(localFilePath)
+  const bytesAfterCompress = await fileSizeBytes(path)
+  logSegmentClient({
+    step: "afterCompress",
+    bytesIn,
+    bytesAfterCompress,
+    ratio: bytesIn && bytesAfterCompress ? Number((bytesAfterCompress / bytesIn).toFixed(2)) : null,
+    usedCompressedFile: path !== localFilePath
+  })
+
   const fs = Taro.getFileSystemManager()
   const base64 = await new Promise<string>((resolve, reject) => {
     fs.readFile({
@@ -98,9 +155,26 @@ export async function segmentImage(localFilePath: string): Promise<SegmentResult
     })
   })
 
+  const base64Chars = base64.length
+  const approxJsonBodyBytes = base64Chars + 40
+  logSegmentClient({
+    step: "beforeRequest",
+    base64Chars,
+    approxJsonBodyBytes,
+    approxJsonBodyKB: Number((approxJsonBodyBytes / 1024).toFixed(1))
+  })
+
   let { result, statusCode } = await postSegmentOnce(base64)
   if (isRetryableSegmentFailure(result, statusCode)) {
+    logSegmentClient({ step: "retry502_504", statusCode })
     ;({ result, statusCode } = await postSegmentOnce(base64))
   }
+  logSegmentClient({
+    step: "done",
+    ok: result.ok,
+    statusCode,
+    cached: result.ok ? result.cached : undefined,
+    code: result.ok ? undefined : result.code
+  })
   return result
 }
