@@ -1,12 +1,14 @@
 import Taro from "@tarojs/taro"
 
-import template1 from "@/assets/templates/template-1.png"
-import template2 from "@/assets/templates/template-2.png"
-import template3 from "@/assets/templates/template-3.png"
-import template4 from "@/assets/templates/template-4.png"
+import { getTemplateCdnUrl } from "@/constants/templateCdn"
 import { CATEGORIES } from "@/constants/categories"
 
-const TEMPLATES = [template1, template2, template3, template4]
+const TEMPLATES = [
+  getTemplateCdnUrl("template-1.png"),
+  getTemplateCdnUrl("template-2.png"),
+  getTemplateCdnUrl("template-3.png"),
+  getTemplateCdnUrl("template-4.png"),
+]
 
 export interface ComposeCanvasEnv {
   canvas: any
@@ -31,17 +33,21 @@ function delay(ms: number): Promise<void> {
 }
 
 function templateIndexForCategory(category: string): number {
-  const i = CATEGORIES.indexOf(category as (typeof CATEGORIES)[number])
+  const i = CATEGORIES.findIndex((c) => c.id === category)
   const idx = i >= 0 ? i : 0
   return idx % TEMPLATES.length
 }
 
-function loadCanvasImage(canvas: any, src: string): Promise<any> {
+async function loadCanvasImage(canvas: any, src: string): Promise<any> {
+  // WeChat Canvas usually works best with a local path, so for remote templates we
+  // resolve the CDN URL into a temp local file path via `getImageInfo`.
+  const resolvedSrc = src.startsWith("http") ? (await Taro.getImageInfo({ src })).path : src
+
   return new Promise((resolve, reject) => {
     const img = canvas.createImage()
     img.onload = () => resolve(img)
     img.onerror = (e: unknown) => reject(e)
-    img.src = src
+    img.src = resolvedSrc
   })
 }
 

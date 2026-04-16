@@ -1,19 +1,23 @@
 import { CATEGORIES, type CategoryId } from "@/constants/categories"
+import { getTemplateCdnUrl } from "@/constants/templateCdn"
 
-import elegantMistyMountains01 from "@/assets/templates/elegant/elegant-misty-mountains-01.png.png"
-import elegantMistyMountains02 from "@/assets/templates/elegant/elegant-misty-mountains-02.png"
-import elegantRicePaper01 from "@/assets/templates/elegant/elegant-rice-paper-01.png"
-import elegantRicePaper02 from "@/assets/templates/elegant/elegant-rice-paper-02.png"
-import elegantTeaZen01 from "@/assets/templates/elegant/elegant-tea-zen-01.png"
-import elegantTeaZen02 from "@/assets/templates/elegant/elegant-tea-zen-02.png"
-import festiveRedChinese01 from "@/assets/templates/festive/festive-red-chinese-01.png .png"
-import festiveRedChinese02 from "@/assets/templates/festive/festive-red-chinese-02.png .png"
-import festiveWindowLattice01 from "@/assets/templates/festive/festive-window-lattice-01.png"
-import festiveWindowLattice02 from "@/assets/templates/festive/festive-window-lattice-02.png"
-import rusticOldHouseTable01 from "@/assets/templates/rustic/rustic-old-house-table-01.png"
-import rusticOldHouseTable02 from "@/assets/templates/rustic/rustic-old-house-table-02.png"
-import template1 from "@/assets/templates/template-1.png"
-import template2 from "@/assets/templates/template-2.png"
+const elegantMistyMountains01 = getTemplateCdnUrl("elegant/elegant-misty-mountains-01.png")
+const elegantMistyMountains02 = getTemplateCdnUrl("elegant/elegant-misty-mountains-02.png")
+const elegantRicePaper01 = getTemplateCdnUrl("elegant/elegant-rice-paper-01.png")
+const elegantRicePaper02 = getTemplateCdnUrl("elegant/elegant-rice-paper-02.png")
+const elegantTeaZen01 = getTemplateCdnUrl("elegant/elegant-tea-zen-01.png")
+const elegantTeaZen02 = getTemplateCdnUrl("elegant/elegant-tea-zen-02.png")
+
+const festiveRedChinese01 = getTemplateCdnUrl("festive/festive-red-chinese-01.png")
+const festiveRedChinese02 = getTemplateCdnUrl("festive/festive-red-chinese-02.png")
+const festiveWindowLattice01 = getTemplateCdnUrl("festive/festive-window-lattice-01.png")
+const festiveWindowLattice02 = getTemplateCdnUrl("festive/festive-window-lattice-02.png")
+
+const rusticOldHouseTable01 = getTemplateCdnUrl("rustic/rustic-old-house-table-01.png")
+const rusticOldHouseTable02 = getTemplateCdnUrl("rustic/rustic-old-house-table-02.png")
+
+const template1 = getTemplateCdnUrl("template-1.png")
+const template2 = getTemplateCdnUrl("template-2.png")
 
 export interface TemplateMeta {
   id: string

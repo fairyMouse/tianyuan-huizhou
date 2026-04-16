@@ -79,7 +79,9 @@ async function drawImage(
   width: number,
   height: number
 ): Promise<void> {
-  await drawImageFromPath(canvas, ctx, src, x, y, width, height)
+  // Resolve remote template URLs into a local file path so canvas can render reliably.
+  const imageInfo = await Taro.getImageInfo({ src })
+  await drawImageFromPath(canvas, ctx, imageInfo.path, x, y, width, height)
 }
 
 function drawCard(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void {
