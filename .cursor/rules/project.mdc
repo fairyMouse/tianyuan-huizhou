@@ -1,0 +1,151 @@
+---
+description: 田园徽州 AI 品牌助手 - 项目核心规则
+alwaysApply: true
+---
+
+# 项目身份
+
+这是「田园徽州 AI 品牌助手」——一个面向黟县小农户的微信小程序，用 AI 生成符合"田园徽州"区域品牌规范的电商素材包。目标用户是不懂设计的农户和合作社，所以**简单到极致**是最高优先级。
+
+# 技术栈（不可偏离）
+
+- **框架**: Taro 4.x + React + TypeScript
+- **编译目标**: 微信小程序（暂不考虑 H5/RN 多端）
+- **样式**: Tailwind CSS + weapp-tailwindcss
+- **状态管理**: Zustand（禁止引入 Redux/Mobx）
+- **后端**: Next.js API Routes（独立仓库，本仓库只调用）
+- **AI**: Claude API（图像理解+文案生成）+ Canvas（前端合成）
+
+禁止引入的库：
+
+- ❌ Ant Design / NutUI 等组件库（会破坏徽韵设计语言，所有组件自己写）
+- ❌ Redux / Mobx / Recoil（用 Zustand）
+- ❌ Less / Sass（只用 Tailwind）
+- ❌ axios（用 Taro.request）
+
+# 设计语言：传统徽韵
+
+## 色彩规范
+
+主背景色永远是宣纸米白系（`bg-paper` / `bg-paper-deep`），**禁止使用纯白 `#FFFFFF` 作为大面积背景**。
+
+颜色使用优先级：
+
+1. 文字：`text-ink`（主） / `text-ink-light`（次） / `text-ink-mute`（辅助）
+2. 主 CTA 按钮：`bg-cinnabar`（朱砂红），整个屏幕同一时刻**只能有一个**朱砂红 CTA
+3. 次要按钮：`bg-huizhou`（徽州青）边框样式
+4. 装饰点缀：`text-gold`（徽州金）仅用于细微装饰，如分隔符、小标识
+5. 辅助强调：`text-jade`（山黛绿）用于"成功"、"通过"类反馈
+
+## 字体规范
+
+- 标题（HuiTitle 组件，font-serif）：思源宋体，营造文化感
+- 正文（默认，font-sans）：思源黑体，保证可读性
+- 字号通过 Tailwind 预设 token：`text-display`（72rpx）/ `text-headline`（56rpx）/ `text-title`（40rpx）/ `text-subtitle`（32rpx）/ `text-body`（28rpx）/ `text-caption`（20rpx）
+
+## 间距与圆角
+
+- 圆角统一用 Tailwind 默认 `rounded`（12rpx），重要卡片用 `rounded-lg`（16rpx），**禁止使用 `rounded-full` 和 `rounded-2xl` 以上的大圆角**——失去传统感
+- 元素间距宁多勿少：页面级 padding 用 `p-8`（64rpx），卡片间距用 `gap-6`（48rpx）
+- 内容区左右边距统一：`px-8`
+
+## 装饰元素
+
+允许使用的徽派视觉元素：
+
+- 水墨笔触 SVG（分隔线、角落点缀）
+- 马头墙剪影（仅用于首页 hero 区域）
+- 徽派窗格纹理（仅用作背景的微弱叠加，opacity ≤ 10%）
+- 印章式标识（用于"田园徽州认证"标签）
+
+**禁止**：渐变色块、霓虹效果、阴影超过 `shadow-md`、毛玻璃效果、3D 元素
+
+## 动效规范
+
+只使用以下动效：
+
+- 页面切换：默认 pop 动画
+- 元素出现：opacity 淡入（300ms）
+- 按钮按下：opacity 降至 0.7
+
+**禁止**：弹跳、缩放、旋转、抖动等活泼动效——与徽韵气质冲突
+
+# 编码规范
+
+## Taro 特殊约束
+
+- ✅ 用 `View` / `Text` / `Image` / `Button` 等 Taro 组件
+- ❌ 禁止用 `div` / `span` / `p` / `h1-h6` 等 HTML 标签
+- ✅ 尺寸单位用 rpx（基于 750rpx 设计稿）
+- ❌ 禁止用 px / rem / em
+- ✅ 按下态用 `hoverClass` 属性
+- ❌ 禁止用 `:hover` 伪类
+- ✅ 图片选择用 `Taro.chooseMedia`
+- ❌ 禁止用 `<input type="file">`
+
+## 组件规范
+
+- 所有自定义组件以 `Hui` 前缀命名（HuiButton / HuiCard / HuiDivider 等）
+- 组件文件结构：`components/HuiButton/index.tsx` + `components/HuiButton/index.module.css`（如需复杂样式）
+- Props 必须定义 TypeScript interface，不接受 any
+- 单个组件文件不超过 200 行，超过则拆分
+
+## 文件组织
+
+- 页面只负责布局和数据获取，业务逻辑下沉到 `services/` 或 `stores/`
+- 常量统一放 `constants/`，禁止在组件内 hardcode 业务字符串
+- 类型定义集中放 `types/`，跨文件复用的类型必须导出
+
+## 命名约定
+
+- 组件：PascalCase（`HuiButton`）
+- 函数/变量：camelCase（`generateAssets`）
+- 常量：UPPER_SNAKE_CASE（`MAX_FILE_SIZE`）
+- 文件夹：kebab-case（虽然组件文件夹用 PascalCase）
+- store action：动词开头（`setImage` / `resetProject`）
+
+# 业务规则
+
+## 品类清单（黟县特产）
+
+固定 10 个，写在 `constants/categories.ts`：
+
+1. 黟县香榧
+2. 腊八豆腐
+3. 泗溪三宝
+4. 徽州黑茶
+5. 黟县笋干
+6. 山地蜂蜜
+7. 古法茶油
+8. 徽州火腿
+9. 竹制品
+10. 其他特产
+
+## 文案调性
+
+所有面向用户的文案：
+
+- **简短**：按钮文字不超过 8 个字，提示文字不超过 20 个字
+- **温暖**：避免"操作失败""错误"等冰冷词，用"再试一次""稍等片刻"
+- **有文化**：可以用"开启""焕新""成器"等略带文气的词，但不要过度雅致到农户看不懂
+
+## "田园徽州"品牌一致性
+
+每张生成的图都必须带"田园徽州"印章式标识（位置：右下角），这是项目的核心价值锚点，不可省略。
+
+# 性能与体验
+
+- 用户操作到看到反馈不超过 300ms（loading 态必须立即出现）
+- 图片生成总时长控制在 30 秒内，超时给明确提示
+- 所有网络请求必须有 loading 态和错误态
+- 首页加载完成时间 < 2 秒
+
+# AI 协作约定
+
+当我让你写代码时：
+
+- 优先复用已有组件和工具函数，不要重复造轮子
+- 写新组件前先检查 `components/` 下是否已有类似的
+- 涉及业务逻辑变更，先简短说明你的理解再写代码
+- 涉及 UI 实现，先描述视觉效果再写代码
+- 不确定时主动问，不要假设
