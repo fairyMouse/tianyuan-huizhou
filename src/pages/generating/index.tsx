@@ -1,22 +1,18 @@
-import { Canvas, Image, Text, View } from '@tarojs/components'
-import Taro, { useLoad } from '@tarojs/taro'
-import { useEffect, useState } from 'react'
+import { Canvas, Image, Text, View } from "@tarojs/components"
+import Taro, { useLoad } from "@tarojs/taro"
+import { useEffect, useState } from "react"
 
-import { HuiButton } from '@/components/HuiButton'
-import {
-  attachComposeSurface,
-  detachComposeSurface,
-  generateImage,
-} from '@/services/api'
-import { useProjectStore } from '@/stores/projectStore'
+import { HuiButton } from "@/components/HuiButton"
+import { attachComposeSurface, detachComposeSurface, generateImage } from "@/services/api"
+import { useProjectStore } from "@/stores/projectStore"
 
-import latticeUrl from '@/assets/lattice.svg'
+import latticeUrl from "@/assets/lattice.svg"
 
 const PROGRESS_LINES = [
-  '正在解析产品轮廓...',
-  '正在调和徽州色彩...',
-  '正在合成品牌画面...',
-  '即将完成...',
+  "正在解析产品轮廓...",
+  "正在调和徽州色彩...",
+  "正在合成品牌画面...",
+  "即将完成..."
 ]
 
 export default function GeneratingPage() {
@@ -34,25 +30,23 @@ export default function GeneratingPage() {
   useLoad(() => {
     const { productImage, category } = useProjectStore.getState()
     if (!productImage || !category) {
-      void Taro.redirectTo({ url: '/pages/upload/index' })
+      void Taro.redirectTo({ url: "/pages/upload/index" })
       return
     }
 
     const run = () => {
       const query = Taro.createSelectorQuery()
       query
-        .select('#compose-canvas')
+        .select("#compose-canvas")
         .fields({ node: true, size: true })
         .exec((res) => {
-          const el = res[0] as
-            | { node: any; width: number; height: number }
-            | undefined
+          const el = res[0] as { node: any; width: number; height: number } | undefined
           if (!el?.node) {
             setFailed(true)
             return
           }
           const canvas = el.node
-          const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | null
+          const ctx = canvas.getContext("2d") as CanvasRenderingContext2D | null
           if (!ctx) {
             setFailed(true)
             return
@@ -69,14 +63,14 @@ export default function GeneratingPage() {
             ctx,
             width: w,
             height: h,
-            dpr,
+            dpr
           })
 
           void generateImage(productImage, category)
             .then((path) => {
               setResultImage(path)
               detachComposeSurface()
-              void Taro.redirectTo({ url: '/pages/result/index' })
+              void Taro.redirectTo({ url: "/pages/result/index" })
             })
             .catch(() => {
               detachComposeSurface()
@@ -90,7 +84,7 @@ export default function GeneratingPage() {
 
   const retry = () => {
     setFailed(false)
-    void Taro.redirectTo({ url: '/pages/upload/index' })
+    void Taro.redirectTo({ url: "/pages/upload/index" })
   }
 
   if (failed) {
@@ -114,13 +108,9 @@ export default function GeneratingPage() {
         type="2d"
         id="compose-canvas"
         className="pointer-events-none fixed opacity-0"
-        style={{ width: '750rpx', height: '750rpx', left: '-8000rpx', top: 0 }}
+        style={{ width: "750rpx", height: "750rpx", left: "-8000rpx", top: 0 }}
       />
-      <Image
-        src={latticeUrl}
-        className="h-32 w-32 animate-hui-spin"
-        mode="aspectFit"
-      />
+      <Image src={latticeUrl} className="h-32 w-32 animate-hui-spin" mode="aspectFit" />
       <Text className="mt-10 text-center font-serif text-title text-ink">
         正在为您的产品赋予徽韵
       </Text>

@@ -1,10 +1,10 @@
-import Taro from '@tarojs/taro'
+import Taro from "@tarojs/taro"
 
-import template1 from '@/assets/templates/template-1.png'
-import template2 from '@/assets/templates/template-2.png'
-import template3 from '@/assets/templates/template-3.png'
-import template4 from '@/assets/templates/template-4.png'
-import { CATEGORIES } from '@/constants/categories'
+import template1 from "@/assets/templates/template-1.png"
+import template2 from "@/assets/templates/template-2.png"
+import template3 from "@/assets/templates/template-3.png"
+import template4 from "@/assets/templates/template-4.png"
+import { CATEGORIES } from "@/constants/categories"
 
 const TEMPLATES = [template1, template2, template3, template4]
 
@@ -45,12 +45,7 @@ function loadCanvasImage(canvas: any, src: string): Promise<any> {
   })
 }
 
-function drawCover(
-  ctx: CanvasRenderingContext2D,
-  img: any,
-  cw: number,
-  ch: number,
-) {
+function drawCover(ctx: CanvasRenderingContext2D, img: any, cw: number, ch: number) {
   const iw = img.width
   const ih = img.height
   const ir = iw / ih
@@ -79,7 +74,7 @@ function drawContainInBox(
   boxX: number,
   boxY: number,
   boxW: number,
-  boxH: number,
+  boxH: number
 ) {
   const iw = img.width
   const ih = img.height
@@ -90,37 +85,32 @@ function drawContainInBox(
   const oy = boxY + (boxH - dh) / 2
   const shadowOff = 6
   ctx.save()
-  ctx.fillStyle = 'rgba(44, 44, 44, 0.12)'
+  ctx.fillStyle = "rgba(44, 44, 44, 0.12)"
   ctx.fillRect(ox + shadowOff, oy + shadowOff, dw, dh)
   ctx.restore()
   ctx.drawImage(img, ox, oy, dw, dh)
 }
 
-function drawSeal(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  size: number,
-) {
+function drawSeal(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
   ctx.save()
-  ctx.fillStyle = '#EBE4D8'
-  ctx.strokeStyle = '#A8362A'
+  ctx.fillStyle = "#EBE4D8"
+  ctx.strokeStyle = "#A8362A"
   ctx.lineWidth = Math.max(2, size * 0.04)
   ctx.fillRect(x, y, size, size)
   ctx.strokeRect(x, y, size, size)
-  ctx.fillStyle = '#A8362A'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
+  ctx.fillStyle = "#A8362A"
+  ctx.textAlign = "center"
+  ctx.textBaseline = "middle"
   ctx.font = `bold ${Math.floor(size * 0.22)}px sans-serif`
-  ctx.fillText('田园', x + size / 2, y + size * 0.38)
-  ctx.fillText('徽州', x + size / 2, y + size * 0.68)
+  ctx.fillText("田园", x + size / 2, y + size * 0.38)
+  ctx.fillText("徽州", x + size / 2, y + size * 0.68)
   ctx.restore()
 }
 
 export async function composeImage(
   env: ComposeCanvasEnv,
   productImage: string,
-  category: string,
+  category: string
 ): Promise<string> {
   const { canvas, ctx, width, height } = env
   const tplSrc = TEMPLATES[templateIndexForCategory(category)]
@@ -146,21 +136,18 @@ export async function composeImage(
       height,
       destWidth: width * env.dpr,
       destHeight: height * env.dpr,
-      fileType: 'png',
+      fileType: "png",
       quality: 1,
       success: (res) => resolve(res.tempFilePath),
-      fail: (err) => reject(err),
+      fail: (err) => reject(err)
     })
   })
 }
 
-export async function generateImage(
-  productImage: string,
-  category: string,
-): Promise<string> {
+export async function generateImage(productImage: string, category: string): Promise<string> {
   await delay(3000)
   if (!activeComposeEnv) {
-    throw new Error('Compose canvas is not ready')
+    throw new Error("Compose canvas is not ready")
   }
   return composeImage(activeComposeEnv, productImage, category)
 }

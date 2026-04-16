@@ -1,3 +1,3 @@
 export default definePageConfig({
-  navigationBarTitleText: '生成中',
+  navigationBarTitleText: "生成中"
 })

@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { create } from "zustand"
 
 interface ProjectState {
   productImage: string | null
@@ -18,5 +18,5 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setProductImage: (img) => set({ productImage: img }),
   setCategory: (cat) => set({ category: cat }),
   setResultImage: (img) => set({ resultImage: img }),
-  reset: () => set({ productImage: null, category: null, resultImage: null }),
+  reset: () => set({ productImage: null, category: null, resultImage: null })
 }))

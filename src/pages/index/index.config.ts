@@ -1,3 +1,3 @@
 export default definePageConfig({
-  navigationBarTitleText: '田园徽州',
+  navigationBarTitleText: "田园徽州"
 })

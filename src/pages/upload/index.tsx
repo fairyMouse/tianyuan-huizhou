@@ -1,9 +1,9 @@
-import { Image, Text, View } from '@tarojs/components'
-import Taro from '@tarojs/taro'
-import { useState } from 'react'
+import { Image, Text, View } from "@tarojs/components"
+import Taro from "@tarojs/taro"
+import { useState } from "react"
 
-import { HuiButton } from '@/components/HuiButton'
-import { useProjectStore } from '@/stores/projectStore'
+import { HuiButton } from "@/components/HuiButton"
+import { useProjectStore } from "@/stores/projectStore"
 
 export default function UploadPage() {
   const setProductImage = useProjectStore((s) => s.setProductImage)
@@ -13,22 +13,22 @@ export default function UploadPage() {
   const pickImage = () => {
     void Taro.chooseMedia({
       count: 1,
-      mediaType: ['image'],
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
+      mediaType: ["image"],
+      sizeType: ["compressed"],
+      sourceType: ["album", "camera"],
       success: (res) => {
         const path = res.tempFiles[0]?.tempFilePath
         if (path) {
           setLocalPath(path)
           setProductImage(path)
         }
-      },
+      }
     })
   }
 
   const goCategory = () => {
     if (!localPath) return
-    void Taro.navigateTo({ url: '/pages/category/index' })
+    void Taro.navigateTo({ url: "/pages/category/index" })
   }
 
   return (
@@ -44,11 +44,7 @@ export default function UploadPage() {
       >
         {localPath ? (
           <>
-            <Image
-              src={localPath}
-              mode="aspectFit"
-              className="h-full w-full rounded"
-            />
+            <Image src={localPath} mode="aspectFit" className="h-full w-full rounded" />
             <View
               className="absolute right-4 top-4 rounded bg-paper px-3 py-2 active:opacity-70"
               hoverClass="opacity-70"
@@ -71,11 +67,7 @@ export default function UploadPage() {
       </View>
 
       <View className="mt-12">
-        <HuiButton
-          type="primary"
-          disabled={!localPath}
-          onClick={goCategory}
-        >
+        <HuiButton type="primary" disabled={!localPath} onClick={goCategory}>
           下一步
         </HuiButton>
       </View>

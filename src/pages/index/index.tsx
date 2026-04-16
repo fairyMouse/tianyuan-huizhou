@@ -1,12 +1,12 @@
-import { Text, View } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import { Text, View } from "@tarojs/components"
+import Taro from "@tarojs/taro"
 
-import { HuiButton } from '@/components/HuiButton'
-import { MountainDecor } from '@/components/MountainDecor'
+import { HuiButton } from "@/components/HuiButton"
+import { MountainDecor } from "@/components/MountainDecor"
 
 export default function Index() {
   const goUpload = () => {
-    void Taro.navigateTo({ url: '/pages/upload/index' })
+    void Taro.navigateTo({ url: "/pages/upload/index" })
   }
 
   return (

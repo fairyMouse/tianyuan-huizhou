@@ -1,10 +1,10 @@
-import { Text, View } from '@tarojs/components'
-import Taro from '@tarojs/taro'
-import { useState } from 'react'
+import { Text, View } from "@tarojs/components"
+import Taro from "@tarojs/taro"
+import { useState } from "react"
 
-import { HuiButton } from '@/components/HuiButton'
-import { CATEGORIES } from '@/constants/categories'
-import { useProjectStore } from '@/stores/projectStore'
+import { HuiButton } from "@/components/HuiButton"
+import { CATEGORIES } from "@/constants/categories"
+import { useProjectStore } from "@/stores/projectStore"
 
 export default function CategoryPage() {
   const setCategory = useProjectStore((s) => s.setCategory)
@@ -13,7 +13,7 @@ export default function CategoryPage() {
 
   const goGenerate = () => {
     if (!selected) return
-    void Taro.navigateTo({ url: '/pages/generating/index' })
+    void Taro.navigateTo({ url: "/pages/generating/index" })
   }
 
   return (
@@ -31,7 +31,7 @@ export default function CategoryPage() {
               <View
                 key={name}
                 className={`flex items-center justify-center rounded bg-paper-deep py-8 ${
-                  isOn ? 'border-2 border-cinnabar' : 'border border-transparent'
+                  isOn ? "border-2 border-cinnabar" : "border border-transparent"
                 }`}
                 hoverClass="opacity-80"
                 onClick={() => {
@@ -41,7 +41,7 @@ export default function CategoryPage() {
               >
                 <Text
                   className={`text-center font-serif text-subtitle text-ink ${
-                    isOn ? 'font-semibold' : ''
+                    isOn ? "font-semibold" : ""
                   }`}
                 >
                   {name}
