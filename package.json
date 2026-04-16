@@ -20,6 +20,7 @@
     "build:jd": "taro build --type jd",
     "build:quickapp": "taro build --type quickapp",
     "build:harmony-hybrid": "taro build --type harmony-hybrid",
+    "dev:api": "cd ../tianyuan-huizhou-api && pnpm dev",
     "dev:weapp": "npm run build:weapp -- --watch",
     "dev:swan": "npm run build:swan -- --watch",
     "dev:alipay": "npm run build:alipay -- --watch",

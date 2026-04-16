@@ -1,8 +1,10 @@
+import Taro from "@tarojs/taro"
 import { useState } from "react"
 
 import { CATEGORIES, type CategoryId } from "@/constants/categories"
 import { pickTemplate } from "@/constants/templates"
 import { composeMainImage } from "@/services/composer"
+import { segmentImage, type SegmentFail } from "@/services/segment"
 
 type Status = "idle" | "composing" | "success" | "error"
 
@@ -22,10 +24,32 @@ export function useImageComposer() {
       if (!category) {
         throw new Error("Unknown category")
       }
+
+      const segResult = await segmentImage(userImagePath)
+      if (!segResult.ok) {
+        const msgMap: Record<SegmentFail["code"], string> = {
+          SEGMENT_NO_SUBJECT: "没识别到产品，换张清晰点的图试试",
+          SEGMENT_API_FAILED: "抠图服务开小差了，请重试",
+          UPLOAD_FAILED: "网络不稳定，请重试",
+          BAD_INPUT: "图片格式有问题，请重新选择"
+        }
+        const content = msgMap[segResult.code] || segResult.message
+        Taro.showModal({
+          title: "抠图失败",
+          content,
+          showCancel: false,
+          confirmText: "重新上传",
+          success: () => {
+            void Taro.redirectTo({ url: "/pages/upload/index" })
+          }
+        })
+        return
+      }
+
       const tempPath = await composeMainImage({
         canvasId: "composer-canvas",
         template,
-        userImagePath,
+        userImagePath: segResult.imageUrl,
         productName: category.name,
         productPinyin: category.pinyin
       })

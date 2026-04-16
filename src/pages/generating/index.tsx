@@ -9,7 +9,7 @@ import { useGenerationStore } from "@/stores/generationStore"
 import latticeUrl from "@/assets/lattice.svg"
 
 const PROGRESS_LINES = [
-  "正在解析产品轮廓...",
+  "正在抠出产品...",
   "正在调和徽州色彩...",
   "正在合成品牌画面...",
   "即将完成..."

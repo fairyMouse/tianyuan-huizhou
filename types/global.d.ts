@@ -1,5 +1,8 @@
 /// <reference types="@tarojs/taro" />
 
+/** Next.js API host (see config/index.ts defineConstants) */
+declare const TARO_APP_API_BASE: string
+
 declare module '*.png';
 declare module '*.gif';
 declare module '*.jpg';

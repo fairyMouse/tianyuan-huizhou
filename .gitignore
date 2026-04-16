@@ -3,6 +3,7 @@ deploy_versions/
 .temp/
 .rn_temp/
 node_modules/
+backend/.env.local
 .DS_Store
 .swc
 .pnpm-store
