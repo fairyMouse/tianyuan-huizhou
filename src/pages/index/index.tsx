@@ -1,6 +1,5 @@
-import { View, Text } from '@tarojs/components'
+import { View } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
-import './index.css'
 
 export default function Index() {
 
@@ -9,8 +8,8 @@ export default function Index() {
   })
 
   return (
-    <View className='index'>
-      <Text>Hello world!</Text>
+    <View className="bg-cinnabar text-paper text-headline p-8 rounded-lg">
+      田园徽州 · 测试
     </View>
   )
 }
