@@ -80,8 +80,19 @@ async function drawImage(
   height: number
 ): Promise<void> {
   // Resolve remote template URLs into a local file path so canvas can render reliably.
-  const imageInfo = await Taro.getImageInfo({ src })
-  await drawImageFromPath(canvas, ctx, imageInfo.path, x, y, width, height)
+  // On iOS weChat, remote templates may fail to load directly by canvas.
+  if (src.startsWith("http")) {
+    try {
+      const imageInfo = await Taro.getImageInfo({ src })
+      await drawImageFromPath(canvas, ctx, imageInfo.path, x, y, width, height)
+      return
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : JSON.stringify(e)
+      throw new Error(`Template imageInfo failed: ${msg}`)
+    }
+  }
+
+  await drawImageFromPath(canvas, ctx, src, x, y, width, height)
 }
 
 function drawCard(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void {

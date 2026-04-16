@@ -32,7 +32,22 @@ export function useImageComposer() {
       setResultPath(tempPath)
       setStatus("success")
     } catch (err) {
-      const rawMessage = err instanceof Error ? err.message : ""
+      const rawMessage =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : err && typeof err === "object"
+              ? // Some WeChat/Taro runtime errors are not `Error` instances.
+                // Try to preserve the most useful field.
+                (err as { message?: unknown }).message
+                  ? String((err as { message?: unknown }).message)
+                  : JSON.stringify(err)
+              : ""
+
+      // Keep the original error for debugging in devtools.
+      // eslint-disable-next-line no-console
+      console.error("[composeMainImage failed]", err)
       const message =
         rawMessage.includes("createImage") || rawMessage.includes("Image load")
           ? "图片处理失败，请重试或更换图片"
