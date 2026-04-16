@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* WeChat: `vh` / `100vh` is unreliable; use `page` + percentage height instead */
+page {
+  height: 100%;
+  box-sizing: border-box;
+  background-color: #f5f0e8;
+}
