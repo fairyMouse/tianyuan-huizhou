@@ -3,11 +3,11 @@ import Taro from "@tarojs/taro"
 import { useState } from "react"
 
 import { HuiButton } from "@/components/HuiButton"
-import { useProjectStore } from "@/stores/projectStore"
+import { useGenerationStore } from "@/stores/generationStore"
 
 export default function UploadPage() {
-  const setProductImage = useProjectStore((s) => s.setProductImage)
-  const existing = useProjectStore((s) => s.productImage)
+  const setUserImagePath = useGenerationStore((s) => s.setUserImagePath)
+  const existing = useGenerationStore((s) => s.userImagePath)
   const [localPath, setLocalPath] = useState<string | null>(existing)
 
   const pickImage = () => {
@@ -20,7 +20,7 @@ export default function UploadPage() {
         const path = res.tempFiles[0]?.tempFilePath
         if (path) {
           setLocalPath(path)
-          setProductImage(path)
+          setUserImagePath(path)
         }
       }
     })

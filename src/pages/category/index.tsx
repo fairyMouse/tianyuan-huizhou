@@ -3,13 +3,13 @@ import Taro from "@tarojs/taro"
 import { useState } from "react"
 
 import { HuiButton } from "@/components/HuiButton"
-import { CATEGORIES } from "@/constants/categories"
-import { useProjectStore } from "@/stores/projectStore"
+import { CATEGORIES, type CategoryId } from "@/constants/categories"
+import { useGenerationStore } from "@/stores/generationStore"
 
 export default function CategoryPage() {
-  const setCategory = useProjectStore((s) => s.setCategory)
-  const savedCategory = useProjectStore((s) => s.category)
-  const [selected, setSelected] = useState<string | null>(savedCategory)
+  const setCategory = useGenerationStore((s) => s.setCategory)
+  const savedCategory = useGenerationStore((s) => s.categoryId)
+  const [selected, setSelected] = useState<CategoryId | null>(savedCategory)
 
   const goGenerate = () => {
     if (!selected) return
@@ -25,18 +25,18 @@ export default function CategoryPage() {
         </Text>
 
         <View className="mt-8 grid grid-cols-2 gap-6">
-          {CATEGORIES.map((name) => {
-            const isOn = selected === name
+          {CATEGORIES.map((category) => {
+            const isOn = selected === category.id
             return (
               <View
-                key={name}
+                key={category.id}
                 className={`flex items-center justify-center rounded bg-paper-deep py-8 ${
                   isOn ? "border-2 border-cinnabar" : "border border-transparent"
                 }`}
                 hoverClass="opacity-80"
                 onClick={() => {
-                  setSelected(name)
-                  setCategory(name)
+                  setSelected(category.id)
+                  setCategory(category.id, category.name)
                 }}
               >
                 <Text
@@ -44,7 +44,7 @@ export default function CategoryPage() {
                     isOn ? "font-semibold" : ""
                   }`}
                 >
-                  {name}
+                  {category.name}
                 </Text>
               </View>
             )
