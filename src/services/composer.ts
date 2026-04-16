@@ -12,9 +12,6 @@ export interface ComposeParams {
 }
 
 const OUTPUT_SIZE = 1080
-const CARD_RADIUS = 16
-const CARD_PADDING = 24
-const CARD_BG = "#F5F0E8"
 
 interface CanvasContext {
   canvas: any
@@ -33,17 +30,7 @@ export async function composeMainImage(params: ComposeParams): Promise<string> {
   const cardX = OUTPUT_SIZE * cx - cardW / 2
   const cardY = OUTPUT_SIZE * cy - cardH / 2
 
-  drawCard(ctx, cardX, cardY, cardW, cardH)
-  await drawImageContain(
-    canvas,
-    ctx,
-    userImagePath,
-    cardX + CARD_PADDING,
-    cardY + CARD_PADDING,
-    cardW - CARD_PADDING * 2,
-    cardH - CARD_PADDING * 2,
-    CARD_RADIUS - 4
-  )
+  await drawCutoutProduct(canvas, ctx, userImagePath, cardX, cardY, cardW, cardH)
   drawTextBlock(ctx, productName, productPinyin, template, cardX, cardY, cardW, cardH)
   drawSeal(ctx, brandText, cardX, cardY, cardW, cardH)
 
@@ -95,67 +82,57 @@ async function drawImage(
   await drawImageFromPath(canvas, ctx, src, x, y, width, height)
 }
 
-function drawCard(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void {
-  ctx.save()
-  ctx.shadowColor = "rgba(44, 44, 44, 0.10)"
-  ctx.shadowBlur = 32
-  ctx.shadowOffsetY = 10
-  ctx.fillStyle = CARD_BG
-  drawRoundedRectPath(ctx, x, y, width, height, CARD_RADIUS)
-  ctx.fill()
-  ctx.restore()
-}
-
-function drawRoundedRectPath(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number
-): void {
-  ctx.beginPath()
-  ctx.moveTo(x + radius, y)
-  ctx.arcTo(x + width, y, x + width, y + height, radius)
-  ctx.arcTo(x + width, y + height, x, y + height, radius)
-  ctx.arcTo(x, y + height, x, y, radius)
-  ctx.arcTo(x, y, x + width, y, radius)
-  ctx.closePath()
-}
-
-async function drawImageContain(
+async function drawCutoutProduct(
   canvas: any,
   ctx: CanvasRenderingContext2D,
   src: string,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number
+  zoneX: number,
+  zoneY: number,
+  zoneW: number,
+  zoneH: number
 ): Promise<void> {
   const imageInfo = await Taro.getImageInfo({ src })
   const imageRatio = imageInfo.width / imageInfo.height
-  const boxRatio = width / height
+  const boxRatio = zoneW / zoneH
 
-  let drawW = width
-  let drawH = height
-  let drawX = x
-  let drawY = y
+  let drawW = zoneW
+  let drawH = zoneH
+  let drawX = zoneX
+  let drawY = zoneY
 
   if (imageRatio > boxRatio) {
-    drawH = width / imageRatio
-    drawY = y + (height - drawH) / 2
+    drawH = zoneW / imageRatio
+    drawY = zoneY + (zoneH - drawH) / 2
   } else {
-    drawW = height * imageRatio
-    drawX = x + (width - drawW) / 2
+    drawW = zoneH * imageRatio
+    drawX = zoneX + (zoneW - drawW) / 2
+  }
+
+  if (canvas && typeof canvas.createImage === "function") {
+    await new Promise<void>((resolve, reject) => {
+      const img = canvas.createImage()
+      img.onload = () => {
+        ctx.save()
+        ctx.shadowColor = "rgba(58, 42, 28, 0.35)"
+        ctx.shadowBlur = 28
+        ctx.shadowOffsetX = 0
+        ctx.shadowOffsetY = 18
+        ctx.drawImage(img, drawX, drawY, drawW, drawH)
+        ctx.restore()
+        resolve()
+      }
+      img.onerror = () => reject(new Error("Image load failed"))
+      img.src = imageInfo.path
+    })
+    return
   }
 
   ctx.save()
-  drawRoundedRectPath(ctx, x, y, width, height, radius)
-  ctx.clip()
-
+  ctx.shadowColor = "rgba(58, 42, 28, 0.35)"
+  ctx.shadowBlur = 28
+  ctx.shadowOffsetX = 0
+  ctx.shadowOffsetY = 18
   await drawImageFromPath(canvas, ctx, imageInfo.path, drawX, drawY, drawW, drawH)
-
   ctx.restore()
 }
 
