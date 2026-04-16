@@ -24,7 +24,7 @@ export default function Index() {
         <HuiButton type="primary" onClick={goUpload} textClassName="font-serif text-subtitle">
           开始打造产品品牌
         </HuiButton>
-        <Text className="mt-4 font-sans text-caption text-ink-mute">仅需一张照片，30秒生成</Text>
+        <Text className="mt-4 font-sans text-caption text-ink-mute">仅需一张照片，10秒生成</Text>
       </View>
     </View>
   )
